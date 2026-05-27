@@ -1,27 +1,71 @@
-# Text Sentiment Classifier — IMDB Reviews
+# Text Sentiment & Spam Classifier — DistilBERT
 
-## Problem
-Classify movie reviews as positive or negative sentiment.
+Two fine-tuned DistilBERT models for text classification deployed
+as an interactive Gradio app on HuggingFace Spaces.
 
-## Dataset
-IMDB — 25,000 train, 25,000 test reviews (HuggingFace datasets)
+## Live Demo
+
+👉 [Try it here](https://huggingface.co/spaces/RazakAIhub/sentiment-spam-classifier)
+
+## Models
+
+| Model | Task | Accuracy |
+|---|---|---|
+| [distilbert-fake-news-classifier](https://huggingface.co/RazakAIhub/distilbert-fake-news-classifier) | Fake vs Real news | 99.15% |
+| [distilbert-spam-classifier](https://huggingface.co/RazakAIhub/distilbert-spam-classifier) | Spam detection | — |
 
 ## Architecture
-- Embedding layer (vocab 10k, dim 128)
-- Bidirectional GRU (2 layers, hidden 128)
-- Dropout 0.3 + gradient clipping
-- BCEWithLogitsLoss
 
-## Results
-- **Val Accuracy: 86%**
-- Precision: 0.86 | Recall: 0.86 | F1: 0.86
-- Balanced performance on both classes
-
-## Key Learnings
-- Word embeddings convert tokens to dense vectors the GRU can process
-- Bidirectional GRU reads sequences forward and backward simultaneously
-- Model showed overfitting after epoch 4 — best checkpoint saved at epoch 4
-- Neutral/ambiguous reviews get low confidence scores — correct behavior
+Input text → DistilBERT tokenizer (max 512 tokens)
+→ DistilBERT encoder → CLS token → classification head
+→ FAKE/REAL or SPAM/NOT SPAM + confidence score
 
 ## Tech Stack
-Python | PyTorch | HuggingFace Datasets | NumPy | Matplotlib | scikit-learn
+
+| Component | Tool |
+|---|---|
+| Models | DistilBERT (distilbert-base-uncased) |
+| Framework | PyTorch + HuggingFace Transformers |
+| Training | Google Colab T4 GPU |
+| Deployment | Gradio on HuggingFace Spaces |
+
+## How to Use
+
+```python
+from transformers import pipeline
+
+# Fake news detection
+pipe = pipeline(
+    "text-classification",
+    model="RazakAIhub/distilbert-fake-news-classifier"
+)
+pipe("NASA confirms water found on Mars.")
+# [{'label': 'REAL', 'score': 0.997}]
+
+# Spam detection
+pipe = pipeline(
+    "text-classification", 
+    model="RazakAIhub/distilbert-spam-classifier"
+)
+pipe("You have won a $1000 gift card! Click now!")
+# [{'label': 'SPAM', 'score': 0.991}]
+```
+
+## How to Run Locally
+
+```bash
+git clone https://github.com/Git169-hub/Sentiment-Analysis
+cd Sentiment-Analysis
+pip install transformers torch gradio
+python app.py
+```
+
+## Author
+
+Razak Shaik | VIT-AP University | CS Final Year
+
+| [Sentiment & Spam Classifier](https://github.com/Git169-hub/Sentiment-Analysis) | Fake news + spam detection | DistilBERT, HuggingFace, Gradio | [Try it](https://huggingface.co/spaces/RazakAIhub/sentiment-spam-classifier) |
+
+[HuggingFace](https://huggingface.co/RazakAIhub) | 
+[LinkedIn](https://www.linkedin.com/in/shaik-razak-6493b7257) | 
+[GitHub](https://github.com/Git169-hub)
